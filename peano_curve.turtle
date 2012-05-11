@@ -1,0 +1,68 @@
+kturtle-script-v1.0
+@(spritehide)
+$len = 1000
+@(clear)
+@(canvassize) $len + 10@(,) $len + 10
+@(go) 5@(,) $len+5
+@(direction) 0
+
+$dir=1
+$i=0
+@(learn) f {
+  @(forward) $len
+}
+@(learn) l {
+  @(turnleft) $dir*90
+}
+@(learn) r {
+  @(turnright) $dir*90
+}
+
+@(learn) A {
+  @(if) $i > 0 {
+    $i = $i - 1
+    A
+    f
+    B
+    f
+    A
+    r
+    f
+    r
+    B
+    f
+    A
+    f
+    B
+    l
+    f
+    l
+    A
+    f
+    B
+    f
+    A
+    $i = $i + 1
+  }
+}
+@(learn) B {
+  $dir = -1*$dir
+  A
+  $dir = -1*$dir
+}
+
+@(learn) seq $n {
+  @(if) $n == 0 {
+    @(return) 0
+  } @(else) {
+    @(return) 3*(seq $n-1) + 2
+  }
+}
+
+@(learn) do_peano $iters {
+  $len = $len/(seq $iters)
+  $i = $iters
+  A
+}
+
+do_peano 3

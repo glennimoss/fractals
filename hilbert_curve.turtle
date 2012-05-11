@@ -1,0 +1,50 @@
+kturtle-script-v1.0
+@(spritehide)
+$len = 1000
+@(clear)
+@(canvassize) $len + 10@(,) $len + 10
+@(go) $len+5@(,)5
+@(direction) -90
+
+$dir=1
+$i=0
+@(learn) f {
+  @(forward) $len
+}
+@(learn) l {
+  @(turnleft) $dir*90
+}
+@(learn) r {
+  @(turnright) $dir*90
+}
+
+@(learn) A {
+  @(if) $i > 0 {
+    $i = $i - 1
+    l
+    B
+    f
+    r
+    A
+    f
+    A
+    r
+    f
+    B
+    l
+    $i = $i + 1
+  }
+}
+@(learn) B {
+  $dir = -1*$dir
+  A
+  $dir = -1*$dir
+}
+
+@(learn) do_hilbert $iters {
+  $len = $len/(2^$iters - 1)
+  $i = $iters
+  A
+}
+
+do_hilbert 5

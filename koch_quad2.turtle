@@ -1,0 +1,55 @@
+kturtle-script-v1.0
+@(clear)
+$len = 1000
+$angle = 60
+
+@(learn) sublen $l {
+  @(return) $l/(3+2*(@(cos) $angle))
+}
+
+@(learn) calcheight $iters {
+  $height = 0
+  $l = $len
+  @(for) $i = 1 @(to) $iters {
+    $height = $height + (sublen $l)*(@(sin) $angle)
+    $l = sublen $l
+  }
+  @(return) $height
+}
+
+@(learn) koch $iter@(,) $dist {
+  @(if) $iter == 0 {
+    @(forward) $dist
+  } @(else) {
+    $sublen = sublen $dist
+    koch $iter-1@(,) $sublen
+    @(turnleft) $angle
+    koch $iter-1@(,) $sublen
+    @(turnright) $angle
+    koch $iter-1@(,) $sublen
+    @(turnright) $angle
+    koch $iter-1@(,) $sublen
+    @(turnleft) $angle
+    koch $iter-1@(,) $sublen
+  }
+}
+
+@(learn) dokoch $iters@(,) $ang {
+  $angle = $ang
+
+  @(spritehide)
+  #clear
+  $height = calcheight $iters
+  @(canvassize) $len@(,) $height + 10
+  @(go) 0@(,) $height+5
+  @(direction) 90
+  koch $iters@(,) $len
+}
+
+@(learn) koch_quad $iters {
+  dokoch $iters@(,) 90
+}
+
+
+koch_quad 6
+#koch_quad 4

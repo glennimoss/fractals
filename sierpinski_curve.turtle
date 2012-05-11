@@ -1,0 +1,34 @@
+kturtle-script-v1.0
+@(spritehide)
+@(clear)
+$width = 1000
+$height = $width*(@(sqrt) 3)/2 + 10
+@(canvassize) $width@(,) $height
+
+@(learn) dosierp $iters {
+  @(go) 0@(,) $height - 5
+  @(direction) 90
+
+  sierp $iters@(,) $width
+  @(repeat) 2 {
+    @(turnleft) 120
+    @(forward) $width
+  }
+}
+
+@(learn) sierp $iter@(,) $len {
+  @(if) $iter == 0 {
+    @(forward) $len
+  } @(else) {
+    @(forward) $len/2
+    @(turnleft) 120
+    @(repeat) 3 {
+      sierp $iter-1@(,) $len/2
+      @(turnright) 120
+    }
+    @(turnright) 120
+    @(forward) $len/2
+  }
+}
+
+dosierp 7

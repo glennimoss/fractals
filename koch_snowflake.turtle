@@ -1,0 +1,35 @@
+kturtle-script-v1.0
+@(spritehide)
+@(clear)
+$len = 1000
+$height = ($len/3*(@(sqrt) 3)/2) + 10
+@(canvassize) $len@(,) $height
+
+
+@(learn) koch $iter@(,) $dist {
+  @(if) $iter == 0 {
+    @(forward) $dist
+  } @(else) {
+    koch $iter-1@(,) $dist/3
+    @(turnleft) 60
+    koch $iter-1@(,) $dist/3
+    @(turnright) 120
+    koch $iter-1@(,) $dist/3
+    @(turnleft) 60
+    koch $iter-1@(,) $dist/3
+  }
+}
+
+@(learn) dokoch $iters {
+  @(go) 0@(,) $height-5
+  @(direction) 90
+  koch $iters@(,) $len
+}
+   
+dokoch 0
+dokoch 1
+dokoch 2
+dokoch 3
+dokoch 4
+dokoch 5
+dokoch 6
