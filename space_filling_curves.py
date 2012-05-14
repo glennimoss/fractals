@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import turtle, sys
 
 size = 900
