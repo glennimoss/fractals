@@ -1,11 +1,6 @@
 #!/usr/bin/python3
 
-import turtle, sys
-
-size = 900
-turtle.hideturtle()
-turtle.speed(0)
-turtle.delay(0)
+import turtle
 
 def inverse_dirs (p, _trans=str.maketrans('+-lr', '-+rl')):
   return p.translate(_trans)
@@ -57,6 +52,12 @@ top_left = (-1, 1)
 def hilbert (iters):
   make_curve(bottom_left, 1, '+Bf-AfA-fB+', iters)
 
+def peano (iters):
+  make_curve(top_left, 2, 'AfBfA-f-BfAfB+f+AfBfA', iters)
+
+def evil_peano (iters):
+  make_curve(top_left, 2, 'Af+A-fA-fA-fAf+Af+Af+A-fA', iters)
+
 def moss (iters):
   prog = 'AfAf-BfBfB-f-Bf+AfA+fBf+AfAfAfA+fBfBfB-'
   make_curve(top_left, 3, prog, iters)
@@ -79,6 +80,12 @@ def spiral2 (iters):
          'f-Bf-B+fB+fB+fBfAfB+fBfAfB+fBfAfBfAfB+fBfAfBfAfB+fBfAfBfAfBfA')
   make_curve(top_left, 6, prog, iters)
 
-globals()[sys.argv[1]](int(sys.argv[2]))
+if __name__ == '__main__':
+  size = 900
+  turtle.hideturtle()
+  turtle.speed(0)
+  turtle.delay(0)
 
-turtle.exitonclick()
+  import sys
+  globals()[sys.argv[1]](int(sys.argv[2]))
+  turtle.exitonclick()
