@@ -2,6 +2,8 @@
 
 import turtle
 
+size = 900
+
 def inverse_dirs (p, _trans=str.maketrans('+-lr', '-+rl')):
   return p.translate(_trans)
 
@@ -11,7 +13,7 @@ def inverse_order (p):
 inverse = inverse_dirs
 #inverse = inverse_order
 
-def make_curve (start_pos, gridsize, prog, iters):
+def make_curve (start_pos, gridsize, prog, iters, heading=0):
   global size
   gridsize = (gridsize+1)**iters - 1
   len = int(size/gridsize)
@@ -21,9 +23,13 @@ def make_curve (start_pos, gridsize, prog, iters):
     len = 2
   size = len*gridsize
   posx, posy = start_pos
+  turtle.hideturtle()
+  turtle.speed(0)
+  turtle.delay(0)
   turtle.setup(size + 20, size + 20, 0, None)
   turtle.penup()
   turtle.setpos(posx*size/2, posy*size/2)
+  turtle.setheading(heading)
   turtle.pendown()
 
   cmds = { 'f': lambda p, i: turtle.forward(len)
@@ -45,6 +51,7 @@ def make_curve (start_pos, gridsize, prog, iters):
   turtle.tracer(iters*2)
   exec(prog, iters)
   turtle.update()
+  turtle.exitonclick()
 
 bottom_left = (-1, -1)
 top_left = (-1, 1)
@@ -81,11 +88,6 @@ def spiral2 (iters):
   make_curve(top_left, 6, prog, iters)
 
 if __name__ == '__main__':
-  size = 900
-  turtle.hideturtle()
-  turtle.speed(0)
-  turtle.delay(0)
 
   import sys
   globals()[sys.argv[1]](int(sys.argv[2]))
-  turtle.exitonclick()
