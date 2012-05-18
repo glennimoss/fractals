@@ -36,6 +36,15 @@ def r (dir):
   if dir is left:
     return up
 
+def txt (dir):
+  if dir is up:
+    return 'u'
+  if dir is down:
+    return 'd'
+  if dir is left:
+    return 'l'
+  if dir is right:
+    return 'r'
 # ???
 #top_left = numpy.array((-1,-1))
 #top_right = numpy.array((1,-1))
@@ -56,7 +65,8 @@ def walk (size):
   end_x = 0
   end_y = edge
   if size % 2:
-    end_x = random.choice((0, edge))
+    #end_x = random.choice((0, edge))
+    end_x = edge
   end_pos = (end_x, end_y)
 
   bad_states = set()
@@ -255,12 +265,66 @@ def get_turn (old, new):
     return '-'
   return '++'
 
+magnitude = lambda v: math.sqrt(numpy.dot(v,v))
+prev_sub = 0
+def get_sub (corner, prev_dir, dir, type2=False, maps={-2: '+A-',
+                                                       -1: 'A',
+                                                       1: 'B',
+                                                       2: '-B+'}):
+  global prev_sub
+  v,h = corner
+  c = numpy.cross(v+h, prev_dir)
+  prev = int(c * magnitude(v+h+prev_dir))
+  c = numpy.cross(v+h, dir)
+  next = int(c * magnitude(v+h+dir))
+  turn = get_turn(prev_dir, dir)
+
+  if type2 and abs(next) == 2:
+    raise ValueError("This shape doesn't work!")
+
+  if prev != next and next == prev_sub:
+    sub = maps[prev] + turn
+    prev_sub = prev
+  else:
+    sub = turn + maps[next]
+    prev_sub = next
+
+  #print('(', txt(v), ',', txt(h), ') p =', txt(prev_dir), ', n =', txt(dir),
+        #turn, prev, next, sub)
+  return sub
+
+def next_corner_type1 (corner, dir):
+  v,h = corner
+  if dir is left or dir is right:
+    dv,dh = v,inv(dir)
+  else:
+    dv,dh = inv(dir),h
+  if dir is h:
+    dv = inv(dv)
+  elif dir is v:
+    dh = inv(dh)
+  return (dv,dh)
+
+def next_corner_type2 (corner, dir):
+  v,h = corner
+  if dir is left or dir is right:
+    return (inv(v),h)
+  return (v,inv(h))
 
 def trace_curve (shape, end_pos):
   x, y = 0, 0
   prev_dir = down
   script = ''
   corner = (up,left)
+  dir = down
+  end_x, end_y = end_pos
+
+  if end_x == 0:
+    type2 = False
+    next_corner = next_corner_type1
+  else:
+    type2 = True
+    next_corner = next_corner_type2
 
   def next_dir (*pos):
     x, y = pos
@@ -283,72 +347,20 @@ def trace_curve (shape, end_pos):
   while True:
     dir = next_dir(x,y)
     if dir is None:
-      script += get_turn(prev_dir, down)
+      #script += get_turn(prev_dir, down)
+      script += get_sub(corner, prev_dir, down, type2)
       break
-    turn = get_turn(prev_dir, dir)
-    script += turn
-    v,h = corner
-    if dir is left or dir is right:
-      dv,dh = v,dir
-    else:
-      dv,dh = dir,h
+    curve[y][x] = get_tile(prev_dir, dir)
 
-    if dir is h:
-      dv = inv(dv)
-      script += get_turn(dir, dv)
-    elif dir is v:
-      dh = inv(dh)
-    else:
-      if dir is inv(h):
-        script += 'A'
-      elif dir is inv(v):
-        script += 'B'
-
-    if v is up:
-      if h is left:
-        if dv is up:
-          script += 'B'
-        else: # dv is down
-          if dh is left:
-            script += 'A'
-          else: # dh is right
-            # Can't do this!
-            raise ValueError()
-      else: # h is right
-        if dv is up:
-          script += '-A'
-        elif (dv,dh) == (down,right):
-          script += '-B'
-        elif (dv,dh) == (down,left):
-          # Can't do this!
-          raise ValueError()
-    else: # v is down
-      if h is left:
-        if (dv,dh) == (up,left):
-          script += '+B'
-        elif (dv,dh) == (up,right):
-          # Can't do this!
-          raise ValueError()
-        elif (dv,dh) == (down,right):
-          script += '+A'
-      else: # h is right
-        if (dv,dh) == (up,left):
-          # Can't do this!
-          raise ValueError()
-        elif (dv,dh) == (up,right):
-          script += '++A'
-        elif (dv,dh) == (down,left):
-          script += '++B'
+    #script += get_turn(prev_dir, dir)
+    script += get_sub(corner, prev_dir, dir, type2)
+    corner = next_corner(corner, dir)
 
     script += 'f'
-    curve[y][x] = get_tile(prev_dir, dir)
 
     x, y = (x,y) + dir
     prev_dir = dir
 
-    dir = next_dir(x,y)
-
-  end_x, end_y = end_pos
   if (x,y) == (end_x,end_y):
     curve[y][x] = get_tile(prev_dir, down)
   else:
@@ -364,6 +376,10 @@ def trace_curve (shape, end_pos):
     print(' '*(end_x-1), end='')
   print('*')
 
+  # simplify
+  script = script.replace('+-', '')
+  script = script.replace('-+', '')
+
   return script
 
 if __name__ == '__main__':
@@ -376,4 +392,8 @@ if __name__ == '__main__':
   print(script)
 
   import space_filling_curves as sfc
-  sfc.make_curve(sfc.top_left, shape_size - 1, script, 1, -90)
+
+  gridsize = int(sfc.size/2)
+  iters = int(math.log(gridsize - 1, shape_size))
+  print(iters, 'iterations')
+  sfc.make_curve(sfc.top_left, shape_size - 1, script, iters, -90)

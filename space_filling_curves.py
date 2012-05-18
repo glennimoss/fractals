@@ -13,7 +13,7 @@ def inverse_order (p):
 inverse = inverse_dirs
 #inverse = inverse_order
 
-def make_curve (start_pos, gridsize, prog, iters, heading=0):
+def make_curve (start_pos, gridsize, prog, iters, heading=-90):
   global size
   gridsize = (gridsize+1)**iters - 1
   len = int(size/gridsize)
@@ -57,16 +57,16 @@ bottom_left = (-1, -1)
 top_left = (-1, 1)
 
 def hilbert (iters):
-  make_curve(bottom_left, 1, '+Bf-AfA-fB+', iters)
+  make_curve(top_left, 1, '+Bf-AfA-fB+', iters)
 
 def peano (iters):
-  make_curve(top_left, 2, 'AfBfA-f-BfAfB+f+AfBfA', iters)
+  make_curve(top_left, 2, 'AfBfA+f+BfAfB-f-AfBfA', iters)
 
 def evil_peano (iters):
-  make_curve(top_left, 2, 'Af+A-fA-fA-fAf+Af+Af+A-fA', iters)
+  make_curve(top_left, 2, 'Af-A+fA+fA+fAf-Af-Af-A+fA', iters)
 
 def moss (iters):
-  prog = 'AfAf-BfBfB-f-Bf+AfA+fBf+AfAfAfA+fBfBfB-'
+  prog = 'AfAf+BfBfB+f+Bf-AfA-fBf-AfAfAfA-fBfBfB+'
   make_curve(top_left, 3, prog, iters)
 
 def hole (iters):
